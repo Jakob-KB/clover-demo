@@ -1,0 +1,5 @@
+streamlit>=1.28
+openai>=1.2
+python-dotenv~=1.1.1
+requests~=2.32.4
+supabase~=2.17.0
