@@ -1,3 +1,3 @@
 # clover-demo
 
-Updated main.py
+Simple auth-required LLM testing environment.
