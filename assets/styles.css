@@ -1,0 +1,20 @@
+/* Sidebar width lock */
+section[data-testid="stSidebar"] {
+    width: 290px !important;
+    min-width: 290px !important;
+    max-width: 290px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    flex-basis: 290px !important;
+}
+
+/* Hide sidebar collapse button */
+[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
+
+/* Align sidebar button text to the left */
+.stButton > button {
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
