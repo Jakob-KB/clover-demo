@@ -6,6 +6,10 @@ def render_home_ui() -> bool:
     st.title("🛠️ Conversation Settings")
     st.info("Changes will only apply to **new** conversations. Note currently **only** system prompt has effect.")
 
+    if deleted_convo_name := st.session_state.get("deleted_convo"):
+        st.toast(f"Conversation '{deleted_convo_name}' has been deleted.", icon="🗑️")
+        st.session_state.deleted_convo = None
+
     with st.form("new_convo_form"):
         st.markdown("**Parameters**")
         model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"])

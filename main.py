@@ -25,6 +25,7 @@ st.set_page_config(page_title="Clover Demo", layout="centered")
 st.session_state.setdefault("user", None)
 st.session_state.setdefault("jwt", None)
 st.session_state.setdefault("selected_convo", None)
+st.session_state.setdefault("deleted_convo", None)
 st.session_state.setdefault("messages", [{"role": "assistant", "content": "How can I help you?"}])
 st.session_state.setdefault("page", "login")
 st.session_state.setdefault("agent_settings", {

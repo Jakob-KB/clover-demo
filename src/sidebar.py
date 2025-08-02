@@ -1,19 +1,17 @@
-# /src/sidebar.py
-
 import streamlit as st
+from streamlit.components.v1 import html
 from src.utils import fetch_conversations, fetch_conversation_history, create_conversation
 from src.auth import supabase
 
 def render_sidebar_ui():
     st.sidebar.title("Clover Demo")
-    st.sidebar.success(f"Logged in as: {st.session_state.user.email}")
 
-    cols = st.sidebar.columns([0.85, 0.25])
+    cols = st.sidebar.columns([1])
     with cols[0]:
         if st.button("➕ New Conversation", key="new_convo", use_container_width=True):
             try:
                 convo = create_conversation(
-                    system_prompt = st.session_state.agent_settings["system_prompt"]
+                    system_prompt=st.session_state.agent_settings["system_prompt"]
                 )
                 st.cache_data.clear()
                 st.session_state.selected_convo = convo
@@ -22,35 +20,42 @@ def render_sidebar_ui():
                 st.rerun()
             except Exception as e:
                 st.sidebar.error(f"Failed to create conversation: {e}")
-    with cols[1]:
-        if st.button("⚙️", key="open_config"):
-            st.session_state.page = "home"
-            st.rerun()
+
+        with st.expander("🛠️ Agent Settings"):
+            prompt_key = "system_prompt"
+            current_value = st.text_area(
+                "System Prompt",
+                value=st.session_state.agent_settings[prompt_key],
+                key="prompt_text_area"
+            )
+
+            if current_value != st.session_state.agent_settings[prompt_key]:
+                st.session_state.agent_settings[prompt_key] = current_value
+                st.toast("✅ System prompt updated.")
 
     st.sidebar.markdown("### Chats")
     clicked_convo_id = None
 
     try:
         conversations = fetch_conversations()
+        sorted_convos = sorted(conversations, key=lambda c: c["updated_at"], reverse=True)
 
-        with st.sidebar.container(height=300):
-            sorted_convos = sorted(conversations, key=lambda c: c["updated_at"], reverse=True)
+        with st.sidebar.container(height=420, border=False):
             for convo in sorted_convos:
+                button_label = f"⮞   {convo['name']}"
                 button_key = f"select_{convo['id']}"
+                button_type = "primary" if st.session_state.selected_convo == convo else "tertiary"
 
-                if st.session_state.selected_convo == convo:
-                    button_type = "primary"
-                else:
-                    button_type = "secondary"
-
-                if st.button(f"⮞   {convo["name"]}", key=button_key, use_container_width=True, type=button_type):
+                if st.button(button_label, key=button_key, type=button_type):
                     clicked_convo_id = convo["id"]
                     break
+
+
     except Exception as e:
         st.sidebar.error(f"Error fetching conversations: {e}")
         conversations = []
 
-    st.sidebar.markdown("")
+    st.sidebar.markdown("---")
 
     if st.sidebar.button("🚪 Log Out"):
         try:

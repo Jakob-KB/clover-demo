@@ -18,3 +18,18 @@ section[data-testid="stSidebar"] {
     text-align: left !important;
     justify-content: flex-start !important;
 }
+
+/* Reduce top padding from 6rem to 3rem */
+div[data-testid="stMainBlockContainer"] {
+    padding-top: 3rem !important;
+}
+
+
+/* Reduce top padding from 6rem to 3rem */
+div[data-testid="stSidebarHeader"] {
+    max-height: 5px !important;
+}
+
+div[data-testid="stSidebarContent"] {
+   /*  overflow: hidden; */
+}
