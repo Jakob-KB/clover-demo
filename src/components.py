@@ -50,4 +50,4 @@ def multi_function_sidebar_button(convo):
             conversation_settings_dialog(convo)
 
         st.session_state[trigger_key] = True
-        st.rerun(scope="fragment")
+        st.rerun()
