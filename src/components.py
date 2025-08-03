@@ -6,14 +6,14 @@ from src.utils import time_ago
 from src.dialog import conversation_settings_dialog
 
 
-def pad_convo_label(convo_name: str, last_turn: str, total_width: int = 24) -> str:
+def pad_convo_label(convo_name: str, last_turn: str, total_width: int = 25) -> str:
     visible_len = len(convo_name) + len(last_turn)
     padding_len = total_width - visible_len
     padding_len = max(padding_len, 1)
     padding = " " * padding_len
     return f"{convo_name}{padding}:gray[{last_turn}]"
 
-@st.fragment
+@st.fragment()
 def multi_function_sidebar_button(convo):
     seg_key = f"{convo["id"]}_seg"
     trigger_key = f"{convo["id"]}_clear_trigger"
@@ -50,4 +50,4 @@ def multi_function_sidebar_button(convo):
             conversation_settings_dialog(convo)
 
         st.session_state[trigger_key] = True
-        st.rerun()
+        st.rerun(scope="fragment")
