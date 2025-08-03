@@ -1,35 +1,56 @@
 /* Sidebar width lock */
 section[data-testid="stSidebar"] {
-    width: 290px !important;
-    min-width: 290px !important;
-    max-width: 290px !important;
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    flex-basis: 290px !important;
+  flex: 0 0 343px !important;
 }
 
-/* Hide sidebar collapse button */
+/* Hide collapse button */
 [data-testid="stSidebarCollapseButton"] {
-    display: none !important;
+  display: none !important;
 }
 
-/* Align sidebar button text to the left */
-.stButton > button {
-    text-align: left !important;
-    justify-content: flex-start !important;
-}
-
-/* Reduce top padding from 6rem to 3rem */
-div[data-testid="stMainBlockContainer"] {
-    padding-top: 3rem !important;
-}
-
-
-/* Reduce top padding from 6rem to 3rem */
+/* Remove sidebar header space */
 div[data-testid="stSidebarHeader"] {
-    max-height: 5px !important;
+  max-height: 5px !important;
 }
 
-div[data-testid="stSidebarContent"] {
-   /*  overflow: hidden; */
+/* Reduce top padding of main content */
+div[data-testid="stMainBlockContainer"] {
+  padding-top: 3rem !important;
+}
+
+/* Align Streamlit buttons to the left */
+.stButton > button {
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+/* First segmented button (label) */
+div[role="radiogroup"] > button[kind="segmented_control"]:first-of-type {
+  flex: 1 !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  font-family: fantasy !important;
+}
+
+/* Second segmented button (⋮) */
+div[role="radiogroup"] > button[kind="segmented_control"]:nth-of-type(2) {
+  flex: 0 0 50px !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+/* Custom code preview block for system prompts */
+.scrolling-code-block {
+    max-height: 200px;
+    height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #0e1117;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 14px;
+    color: white;
+    border: 1px solid #333;
 }

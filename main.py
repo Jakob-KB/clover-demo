@@ -1,12 +1,6 @@
 # main.py
 
-import os
 import streamlit as st
-from dotenv import load_dotenv
-
-
-# Environment
-load_dotenv()
 
 # Local Modules
 from src.auth import render_login_ui
@@ -24,8 +18,12 @@ st.set_page_config(page_title="Clover Demo", layout="centered")
 # Session State Defaults
 st.session_state.setdefault("user", None)
 st.session_state.setdefault("jwt", None)
+st.session_state.setdefault("clicked_convo_id", None)
 st.session_state.setdefault("selected_convo", None)
-st.session_state.setdefault("deleted_convo", None)
+st.session_state.setdefault("deleted_convo_name", None)
+st.session_state.setdefault("new_convo_name", None)
+st.session_state.setdefault("convos", None)
+st.session_state.setdefault("initial_login", True)
 st.session_state.setdefault("messages", [{"role": "assistant", "content": "How can I help you?"}])
 st.session_state.setdefault("page", "login")
 st.session_state.setdefault("agent_settings", {
@@ -39,6 +37,14 @@ st.session_state.setdefault("agent_settings", {
 
 if st.session_state.page == "login":
     render_login_ui()
+
+if deleted_convo_name := st.session_state.get("deleted_convo_name"):
+    st.toast(f"Conversation '{deleted_convo_name}' has been deleted.", icon=":material/delete:")
+    st.session_state.deleted_convo_name = None
+
+if new_convo_name := st.session_state.get("new_convo_name"):
+    st.toast(f"Conversation '{new_convo_name}' has been created.", icon=":material/save:")
+    st.session_state.new_convo_name = None
 
 if st.session_state.page == "home":
     render_sidebar_ui()

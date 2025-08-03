@@ -135,9 +135,9 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.streamlit/secrets.toml
 .idea
 .idea/
-.env
 .envrc
 .venv
 env/

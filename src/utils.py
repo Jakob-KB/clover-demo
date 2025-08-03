@@ -1,22 +1,19 @@
 # /src/utils.py
 
-import os
 import random
 import requests
+
 import streamlit as st
 from supabase import create_client
-from dotenv import load_dotenv
-
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-load_dotenv()
+SUPABASE_URL = st.secrets.get("SUPABASE_URL")
+SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY")
+SUPABASE_FUNCTIONS_URL = f"{SUPABASE_URL}/functions/v1"
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
-
-SUPABASE_FUNCTIONS_URL = f"{os.getenv('SUPABASE_URL')}/functions/v1"
-FASTAPI_BASE_URL = os.getenv("FASTAPI_BASE_URL", "https://clover-llm.duckdns.org/api")
+FASTAPI_BASE_URL = st.secrets.get("FASTAPI_BASE_URL")
 
 
 # Headers
@@ -78,6 +75,20 @@ def create_conversation(conversation_name: str | None = None, system_prompt: str
     return response.json()
 
 
+def update_conversation_name(convo_id: str, new_name: str):
+    """
+    Update the name of a conversation using its ID.
+    Returns True if successful, False otherwise.
+    """
+    authed_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    authed_client.postgrest.auth(st.session_state.jwt)
+
+    authed_client.table("conversations") \
+        .update({"name": new_name}) \
+        .eq("id", convo_id) \
+        .execute()
+
+
 def fetch_system_prompt(convo_id: str) -> str | None:
     """
     Fetch only the system_prompt using an authenticated Supabase client with the user's JWT.
@@ -96,6 +107,7 @@ def fetch_system_prompt(convo_id: str) -> str | None:
         return response.data.get("system_prompt")
 
     return None
+
 
 # Send a new turn (user message) to the backend
 def send_turn(conversation_id: str, user_message: str) -> str:
@@ -119,29 +131,17 @@ def send_turn(conversation_id: str, user_message: str) -> str:
 
 # Stream assistant response chunks for a new turn
 def stream_chunks(conversation_id: str, user_message: str):
-    """
-    Stream assistant response in chunks from FastAPI backend.
-    """
-    url = f"{FASTAPI_BASE_URL}/conversations/{conversation_id}/turn"
-    headers = _auth_headers()
+    url  = f"{FASTAPI_BASE_URL}/conversations/{conversation_id}/turn"
+    resp = requests.post(url, headers=_auth_headers(),
+                         json={"user_message": user_message},
+                         stream=True, timeout=30, verify=False)
+    resp.raise_for_status()
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json={"user_message": user_message},
-        stream=True,
-        timeout=30,
-        verify=False
-    )
-    response.raise_for_status()
-
-    full_response = ""
-    for chunk in response.iter_lines(decode_unicode=True):
+    for chunk in resp.iter_content(chunk_size=1024, decode_unicode=True):
         if chunk:
-            full_response += chunk
-            yield chunk
+            yield chunk               # chunk already contains any "\n"s
 
-    return full_response
+
 
 def delete_conversation(conversation_id: str):
     """
@@ -156,18 +156,63 @@ def delete_conversation(conversation_id: str):
     response.raise_for_status()
 
 
-# Generate random conversation name
 def get_random_conversation_name() -> str:
     ADJECTIVES = [
-        "Crimson", "Emerald", "Sapphire", "Golden", "Silent",
-        "Hidden", "Quantum", "Luminous", "Wandering", "Infinite",
-        "Velvet", "Mystic", "Solar", "Celestial", "Radiant",
-        "Obsidian", "Arcane", "Eternal", "Vivid", "Serene"
+        "Silent", "Golden", "Quantum", "Majestic", "Frosty", "Shy", "Bold",
+        "Radiant", "Velvety", "Hidden", "Witty", "Zany", "Lively", "Eager",
+        "Rapid", "Swift", "Crimson", "Cosmic", "Bouncy", "Brisk", "Cheery",
+        "Gentle", "Mellow", "Chilly", "Curious", "Playful", "Mystic", "Nimble"
     ]
+
     NOUNS = [
-        "Echo", "Odyssey", "Mosaic", "Voyage", "Spectrum",
-        "Whisper", "Cipher", "Frontier", "Archive", "Nexus",
-        "Horizon", "Pulse", "Vertex", "Enigma", "Mirage",
-        "Zenith", "Aurora", "Cascade", "Labyrinth", "Haven"
+        "Echo", "Pulse", "Labyrinth", "Nexus", "Odyssey", "Signal", "Summit",
+        "Vertex", "Mirage", "Beacon", "Galaxy", "Whisper", "Harbor", "Fragment",
+        "Crystal", "Voyager", "Orbit", "Flame", "Nova", "Dust", "Cloud", "Meadow",
+        "Horizon", "Circuit", "Pattern", "Memory", "Sparkle"
     ]
-    return f"{random.choice(ADJECTIVES)}-{random.choice(NOUNS)}-{random.randint(0, 99)}"
+
+    number = f"{random.randint(0, 99):02d}"
+    adjective = random.choice(ADJECTIVES)
+    noun = random.choice(NOUNS)
+
+    while len(adjective) + len(noun) > 16:
+        adjective = random.choice(ADJECTIVES)
+        noun = random.choice(NOUNS)
+
+    return f"{adjective}-{noun}-{number}"
+
+
+from datetime import datetime, timezone
+
+def time_ago(dt_str=None):
+    now = datetime.now(timezone.utc)
+
+    if not dt_str:
+        return "???"  # no value
+
+    if isinstance(dt_str, str):
+        try:
+            dt_str = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+        except Exception:
+            return "???"  # invalid string format
+
+    if not isinstance(dt_str, datetime):
+        return "???"
+
+    then = dt_str
+    delta = now - then
+
+    seconds = int(delta.total_seconds())
+    if seconds <= 30:
+        return "0s"
+    if seconds <= 60:
+        # return f"{seconds}s"
+        return "1m"
+    minutes = seconds // 60
+    if minutes < 60:
+        return f"{minutes}m"
+    hours = minutes // 60
+    if hours < 24:
+        return f"{hours}h"
+    days = hours // 24
+    return f"{min(days, 99)}d"
