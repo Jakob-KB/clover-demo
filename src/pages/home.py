@@ -7,6 +7,10 @@ def render_home_ui():
     st.title("Clover Demo")
     st.success(f":material/account_circle: Logged in as: {st.session_state.user.email}")
 
+    # with st.container(border=True):
+    #     st.write("**Settings**")
+    #     st.info("To be implemented.")
+
     with st.container(border=False):
         st.markdown("""
             Welcome to the Clover Demo, below is are simple instructions as well as an overview of how to use this tool to interact with and improve the Clover LLM Agent.

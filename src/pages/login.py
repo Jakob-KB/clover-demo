@@ -4,11 +4,11 @@ import streamlit as st
 from supabase import create_client, Client
 
 
-SUPABASE_URL = st.secrets.get("SUPABASE_URL")
-SUPABASE_KEY = st.secrets.get("SUPABASE_ANON_KEY")
+SUPABASE_URL: str = st.secrets.get("SUPABASE_URL")
+SUPABASE_KEY: str = st.secrets.get("SUPABASE_ANON_KEY")
 
-DEFAULT_EMAIL = st.secrets.get("DEFAULT_EMAIL")
-DEFAULT_PASSWORD = st.secrets.get("DEFAULT_PASSWORD")
+DEFAULT_EMAIL: str = st.secrets.get("DEFAULT_EMAIL")
+DEFAULT_PASSWORD: str = st.secrets.get("DEFAULT_PASSWORD")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 

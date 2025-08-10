@@ -2,19 +2,11 @@
 
 import streamlit as st
 
-from src.utils import time_ago
-from src.dialog import conversation_settings_dialog
-
-
-def pad_convo_label(convo_name: str, last_turn: str, total_width: int = 24) -> str:
-    visible_len = len(convo_name) + len(last_turn)
-    padding_len = total_width - visible_len
-    padding_len = max(padding_len, 1)
-    padding = " " * padding_len
-    return f"{convo_name}{padding}:gray[{last_turn}]"
+from src.utils.misc import time_ago, pad_convo_label
+from src.dialogs.view_config import render_view_config_dialog_ui
 
 @st.fragment()
-def multi_function_sidebar_button(convo):
+def segment_button(convo):
     seg_key = f"{convo["id"]}_seg"
     trigger_key = f"{convo["id"]}_clear_trigger"
 
@@ -45,9 +37,9 @@ def multi_function_sidebar_button(convo):
             st.session_state[trigger_key] = True
             st.rerun()
 
+
         elif seg_value == options[1]:
             st.session_state["deletion_confirmation"] = False
-            conversation_settings_dialog(convo)
-
-        st.session_state[trigger_key] = True
-        st.rerun(scope="fragment")
+            render_view_config_dialog_ui(convo)
+            st.session_state[trigger_key] = True
+            st.rerun(scope="fragment")

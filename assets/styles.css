@@ -24,20 +24,20 @@ div[data-testid="stMainBlockContainer"] {
   justify-content: flex-start !important;
 }
 
-/* First segmented button (label) */
-div[role="radiogroup"] > button[kind="segmented_control"]:first-of-type {
+/* Only inside the sidebar */
+section[data-testid="stSidebar"] div[role="radiogroup"] > button[kind="segmented_control"]:first-of-type {
   flex: 1 !important;
   justify-content: flex-start !important;
   text-align: left !important;
   font-family: fantasy !important;
 }
 
-/* Second segmented button (⋮) */
-div[role="radiogroup"] > button[kind="segmented_control"]:nth-of-type(2) {
+section[data-testid="stSidebar"] div[role="radiogroup"] > button[kind="segmented_control"]:nth-of-type(2) {
   flex: 0 0 50px !important;
   justify-content: center !important;
   text-align: center !important;
 }
+
 
 /* Custom code preview block for system prompts */
 .scrolling-code-block {
